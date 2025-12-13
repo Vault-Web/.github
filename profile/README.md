@@ -1,53 +1,111 @@
-## Welcome to the **Vault Web GitHub organization**!
+# Vault Web
 
-Our mission is to build a **modular, self-hosted home portal ecosystem** that allows users to manage their own private services securely from a single dashboard. The goal is to provide a **central entry point for multiple tools**—from file storage to chats and much more—optimized for home server environments.
+**Vault Web** is the core project of the **Vault Web ecosystem**.  
+It is a full-stack application combining a **Spring Boot backend**, an **Angular frontend**, and a **PostgreSQL** database.
 
----
-
-## Our Projects
-
-### 1. [Vault Web](https://github.com/Vault-Web/vault-web)
-The core of the ecosystem.  
-- Full-stack project with **Spring Boot backend**, **Angular frontend**, and **PostgreSQL** database.  
-- Provides:
-  - 💬 **Internal chats and collaboration tools**  
-  - ☁️ **Private file cloud** (`vault-cloud`) for secure storage  
-  - 🔐 **Built-in password manager**  
-  - 🧑‍💻 **User and session management**  
-- Designed to be **modular and extensible**, perfect for experimenting with home server features.  
-
-### 2. [Cloud Page](https://github.com/Vault-Web/cloud-page)
-A dedicated backend service for managing files and folders for each user.  
-- Provides a **file explorer-like interface** via API.  
-- Allows **viewing, creating, editing, and deleting files** associated with each account.  
-- Authenticated with **JWT tokens**, sharing the same master key as Vault Web.  
-- Focused on **private, home-server storage** with secure access.  
-
-### 3. [Password Manager](https://github.com/Vault-Web/password-manager)
-Planned future project.  
-- Will provide a **secure, self-hosted password management tool**.  
-- Currently under research for **security feasibility and best practices**.  
-
-### 4. [Server Docs](https://github.com/Vault-Web/server-docs)
-Central documentation repository.  
-- Contains **detailed documentation for all Vault Web repositories**.  
-- Includes a **sample server setup** on [Deniz’s](https://github.com/DenizAltunkapan) server with **Headscale VPN** integration.  
-- Provides step-by-step instructions, best practices, and usage examples.
+Vault Web acts as a **central dashboard** for a modular, self-hosted home server ecosystem. It provides a single entry point where multiple services are integrated into one secure web interface.
 
 ---
 
-## Goals & Philosophy
+## What Vault Web Provides
 
-- **Modularity**: Each service can be **developed, replaced, or extended independently**.  
-- **Home-server focus**: Designed for self-hosted environments, allowing hands-on learning and experimentation.  
-- **Continuous improvement**: Projects are under **active development** and evolve with new features.  
+Vault Web is responsible for:
+
+- 💬 **Internal chats and collaboration tools**
+- 🧑‍💻 **User and session management**
+- 🔐 **Central authentication (JWT-based)**
+- 🧩 **Frontend integration of external services**
+
+Additional services are **not implemented directly in this repository**, but are embedded into the Vault Web frontend.
+
+For example, file storage and file management are provided by the **Cloud Page** service:  
+👉 https://github.com/Vault-Web/cloud-page
 
 ---
 
-## How to Get Involved
+## Project Structure
 
-We welcome contributions, suggestions, and bug reports. Please follow the [contribution guidelines](https://github.com/Vault-Web/.github/blob/main/CONTRIBUTING.md).  
+- 📁 [**DIRECTORY.md**](https://github.com/Vault-Web/vault-web/blob/main/DIRECTORY.md) – generated project structure overview  
+- 📚 [**Javadoc**](https://vault-web.github.io/vault-web) – backend API documentation  
 
 ---
 
-💡 **Note:** This organization is primarily for **home-server experimentation**. Services are functional, but care should be taken before using them in production environments.
+## Local Development
+
+Vault Web uses **Docker** for local development.
+
+### Requirements
+
+- Docker & Docker Compose  
+- Java 21+ (Java 24 supported)  
+- Node.js & npm  
+
+---
+
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/Vault-Web/vault-web.git
+cd vault-web
+````
+
+---
+
+## 2. Environment Configuration (`.env`)
+
+⚠️ **You do NOT need to create a `.env` file manually.**
+A `.env` file already exists in the repository.
+
+You may adjust the values if needed, but make sure that:
+
+> **The database configuration in `.env` matches exactly with the backend `application.properties`.**
+
+---
+
+## 3. Start PostgreSQL and pgAdmin
+
+```bash
+docker compose up -d
+```
+
+* PostgreSQL: `localhost:<DB_PORT>`
+* pgAdmin: [http://localhost:8081](http://localhost:8081)
+
+---
+
+## 4. Backend (Spring Boot)
+
+Configuration file:
+`backend/src/main/resources/application.properties`
+
+Ensure the database values match the `.env` file.
+
+Start the backend:
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+* API: [http://localhost:8080](http://localhost:8080)
+* Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+---
+
+## 5. Frontend (Angular)
+
+```bash
+cd frontend
+npm install
+ng serve
+```
+
+Open:
+👉 [http://localhost:4200](http://localhost:4200)
+
+---
+
+## Notes
+
+This project is intended for **self-hosted and home-server environments**.
+Contributions and feedback are welcome.
