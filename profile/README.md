@@ -1,111 +1,137 @@
-# Vault Web
+## Welcome to the **Vault Web GitHub Organization** 👋
 
-**Vault Web** is the core project of the **Vault Web ecosystem**.  
-It is a full-stack application combining a **Spring Boot backend**, an **Angular frontend**, and a **PostgreSQL** database.
+Our mission is to build a **modular, self-hosted home portal ecosystem** that allows users to manage their **private services securely from a single dashboard**.  
+Vault Web aims to provide a **central entry point for multiple tools**—from file management to chats and future services—**optimized for home server environments**.
 
-Vault Web acts as a **central dashboard** for a modular, self-hosted home server ecosystem. It provides a single entry point where multiple services are integrated into one secure web interface.
-
----
-
-## What Vault Web Provides
-
-Vault Web is responsible for:
-
-- 💬 **Internal chats and collaboration tools**
-- 🧑‍💻 **User and session management**
-- 🔐 **Central authentication (JWT-based)**
-- 🧩 **Frontend integration of external services**
-
-Additional services are **not implemented directly in this repository**, but are embedded into the Vault Web frontend.
-
-For example, file storage and file management are provided by the **Cloud Page** service:  
-👉 https://github.com/Vault-Web/cloud-page
+The organization is designed as a **learning- and experimentation-focused ecosystem**, combining clean architecture with real-world use cases around authentication, distributed services, and self-hosting.
 
 ---
 
-## Project Structure
+## Architecture Overview
 
-- 📁 [**DIRECTORY.md**](https://github.com/Vault-Web/vault-web/blob/main/DIRECTORY.md) – generated project structure overview  
-- 📚 [**Javadoc**](https://vault-web.github.io/vault-web) – backend API documentation  
+Vault Web follows a clear and intentional architecture:
 
----
+- 🧱 **One core monolithic application** (Vault Web)
+- 🔌 **Multiple independent backend services**
+- 🖥️ **One centralized frontend** that integrates all services via APIs
 
-## Local Development
+### Key Principles
 
-Vault Web uses **Docker** for local development.
+- All backend services live in **separate repositories**
+- The **entire frontend is centralized** in the core Vault Web repository
+- External services run **fully independently**
+- Communication happens **only via APIs**
+- If one service fails, the rest of the system continues to work
+- New services can be added **without modifying existing backends**
 
-### Requirements
-
-- Docker & Docker Compose  
-- Java 21+ (Java 24 supported)  
-- Node.js & npm  
-
----
-
-## 1. Clone the Repository
-
-```bash
-git clone https://github.com/Vault-Web/vault-web.git
-cd vault-web
-````
+This keeps the system extensible without unnecessary coupling.
 
 ---
 
-## 2. Environment Configuration (`.env`)
+## Our Projects
 
-⚠️ **You do NOT need to create a `.env` file manually.**
-A `.env` file already exists in the repository.
+### 1. [Vault Web (Core)](https://github.com/Vault-Web/vault-web)
 
-You may adjust the values if needed, but make sure that:
+The heart of the ecosystem and the main user entry point.
 
-> **The database configuration in `.env` matches exactly with the backend `application.properties`.**
+**Tech stack**
+- Spring Boot (backend)
+- Angular (frontend)
+- PostgreSQL (database)
 
----
+**Responsibilities**
+- 💬 Internal chats and basic collaboration tools  
+- 🧑‍💻 User and session management  
+- 🔐 Central login & JWT handling  
+- 🖥️ Unified dashboard UI  
+- 🧩 Frontend integration of all external services  
 
-## 3. Start PostgreSQL and pgAdmin
-
-```bash
-docker compose up -d
-```
-
-* PostgreSQL: `localhost:<DB_PORT>`
-* pgAdmin: [http://localhost:8081](http://localhost:8081)
-
----
-
-## 4. Backend (Spring Boot)
-
-Configuration file:
-`backend/src/main/resources/application.properties`
-
-Ensure the database values match the `.env` file.
-
-Start the backend:
-
-```bash
-cd backend
-./mvnw spring-boot:run
-```
-
-* API: [http://localhost:8080](http://localhost:8080)
-* Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+⚠️ The Vault Web backend handles **core services only**.  
+All other services are accessed via APIs and do **not** depend on it.
 
 ---
 
-## 5. Frontend (Angular)
+### 2. [Cloud Page](https://github.com/Vault-Web/cloud-page)
 
-```bash
-cd frontend
-npm install
-ng serve
-```
+A **backend-only**, fully independent service for file and folder management.
 
-Open:
-👉 [http://localhost:4200](http://localhost:4200)
+**Features**
+- File explorer–style API
+- View, create, edit, and delete files and folders
+- Per-user file isolation
+- JWT-based authentication
+
+Cloud Page runs standalone and is integrated into the Vault Web frontend via API calls.
 
 ---
 
-## Notes
+### 3. [Auth API Gateway](https://github.com/Vault-Web/auth-api-gateway)
 
-This project is intended for **self-hosted and home-server environments**.
-Contributions and feedback are welcome.
+An important architectural improvement currently under active development.
+
+**Goal**
+Introduce a **central authentication & authorization gateway**.
+
+Instead of each service validating JWTs individually, the gateway will:
+- handle authentication
+- validate tokens
+- enforce authorization rules
+
+This will simplify backend services, improve security consistency, and make the ecosystem easier to extend.
+
+Contributions and design discussions are **highly welcome**.
+
+---
+
+### 4. [Password Manager](https://github.com/Vault-Web/password-manager)
+
+A future backend service focused on secure password management.
+
+**Status**
+- Currently in research and planning phase
+- Strong focus on encryption, secure storage, and threat modeling
+
+Because of the sensitive security domain, development is intentionally cautious.
+Conceptual and security-focused contributions are especially valuable.
+
+---
+
+### 5. [Server Docs](https://github.com/Vault-Web/server-docs)
+
+The central documentation repository for the entire ecosystem.
+
+Includes:
+- Detailed documentation for all Vault Web services
+- Example home server deployments
+- Headscale VPN integration
+- Best practices for self-hosting
+
+---
+
+## Goals & Philosophy
+
+- **Modularity**: Services can be developed, replaced, or extended independently  
+- **Home-server focus**: Built for self-hosted environments and hands-on learning  
+- **Clean architecture**: Clear separation between core, services, and frontend  
+- **Continuous improvement**: Active development and architectural evolution  
+
+---
+
+## How to Get Involved
+
+We welcome:
+- bug reports
+- architectural discussions
+- new service ideas
+- code contributions
+
+Please follow the contribution guidelines:  
+👉 https://github.com/Vault-Web/.github/blob/main/CONTRIBUTING.md
+
+You can also open Issues or start Discussions in any repository.
+
+---
+
+💡 **Note**  
+Vault Web is primarily designed for **home-server experimentation and learning**.  
+While functional, it should not be considered production-ready without proper security review and hardening.
