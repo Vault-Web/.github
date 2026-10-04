@@ -1,84 +1,77 @@
 # Vault Web
 
-Vault Web is a modular, self-hosted portal for private services on a home server. It provides one web interface for account management, communication, files, and independently deployed applications.
+**A private entry point for chat, files, habits, passwords, and self-hosted services.**
 
-The project combines a central Angular frontend with a core Spring Boot application and service-specific backends connected through APIs. It is built for practical self-hosting, architecture experiments, and security-focused learning.
+Vault Web is a modular, self-hosted portal for private home-server services. It provides a single web interface for **authentication**, communication, file management, habit tracking, and service integration while keeping each service independently deployable.
 
-## Architecture
+The project is designed as a lighter, more focused alternative to large all-in-one platforms: small services, clear boundaries, **VPN-first deployment**, and practical operations for a personal server.
 
-Vault Web follows a service-oriented architecture with a centralized user interface:
+## What This Organization Builds
 
-- The Angular frontend is maintained in the core `vault-web` repository.
-- The core backend owns users, sessions, authentication, chat, and shared application concerns.
-- Domain services expose independent APIs and own their application logic.
-- Runtime integration happens through authenticated HTTP APIs and configurable frontend links.
-- The deployment stack is managed with Docker Compose.
-- Remote access is designed around Headscale/Tailscale, HTTPS termination, and private Split DNS.
+Vault Web combines a central portal with domain-specific services. The core application owns users, sessions, chat, and the main navigation experience. Services such as Cloud Page, Vault Habits, and Vaultwarden stay separate and integrate through APIs or **authenticated frontend links**. New services can be added without folding all logic into the portal itself.
 
-```text
-Browser or mobile client
-          |
-          v
-  Vault Web frontend
-          |
-          +--------> Vault Web core API
-          +--------> Cloud Page API
-          +--------> Additional service APIs
+```mermaid
+flowchart LR
+    client[VPN client] --> proxy[Caddy / HTTPS]
+    proxy --> frontend[Vault Web frontend]
+    frontend --> core[Core backend]
+    frontend --> cloud[Cloud Page backend]
+    frontend --> habits[Vault Habits]
+    proxy --> vaultwarden[Vaultwarden]
+    frontend --> extensions[Extensible by other services]
+
+    core --> coredb[(Core DB)]
+    cloud --> clouddb[(Cloud DB)]
+    coredb --> postgres[(PostgreSQL instance)]
+    clouddb --> postgres
+    cloud --> storage[(User storage)]
+    syncthing[Syncthing] -. syncs .-> storage
+    extensions -.-> apis[Service APIs / links]
+    headscale[Headscale / Tailscale] -. private access .-> client
 ```
-
-The long-term authentication direction is a dedicated gateway that centralizes token validation and authorization policies across services.
 
 ## Repositories
 
-| Repository | Purpose | Status |
-| --- | --- | --- |
-| [vault-web](https://github.com/Vault-Web/vault-web) | Central Angular frontend and Spring Boot core for users, sessions, chat, and service integration | Active |
-| [cloud-page](https://github.com/Vault-Web/cloud-page) | File and folder management API with per-user storage isolation | Active |
-| [vault-habits](https://github.com/Vault-Web/vault-habits) | Self-hosted habit tracking with Vault Web authentication handoff | Active |
-| [auth-api-gateway](https://github.com/Vault-Web/auth-api-gateway) | Central authentication and authorization gateway | In development |
-| [password-manager](https://github.com/Vault-Web/password-manager) | Dedicated password-management service with an encryption-focused design | Research and planning |
-| [deploy](https://github.com/Vault-Web/deploy) | Docker Compose deployment stack and service submodules | Active |
-| [server-docs](https://github.com/Vault-Web/server-docs) | Deployment, Headscale, Syncthing, backup, and operations documentation | Active |
+| Repository | Role |
+| --- | --- |
+| [`vault-web`](https://github.com/Vault-Web/vault-web) | Central portal frontend and core backend with **authentication**, sessions, chat, and navigation |
+| [`cloud-page`](https://github.com/Vault-Web/cloud-page) | File-management backend with **per-user storage isolation** |
+| [`vault-habits`](https://github.com/Vault-Web/vault-habits) | Self-hosted habit tracker integrated through Vault Web login |
+| [`vaultwarden`](https://github.com/Vault-Web/vaultwarden) | Integrated upstream/forked **Bitwarden-compatible** password vault service |
+| [`auth-api-gateway`](https://github.com/Vault-Web/auth-api-gateway) | Experimental authentication gateway, not required for the current production stack |
+| [`deploy`](https://github.com/Vault-Web/deploy) | Production Docker Compose stack, runtime configuration, and **VPN-first deployment** |
+| [`server-docs`](https://github.com/Vault-Web/server-docs) | **Headscale**, **Split DNS**, Syncthing, backup, and operations documentation |
+| [`password-manager`](https://github.com/Vault-Web/password-manager) | Archived custom password-vault service, replaced by Vaultwarden integration |
 
-## Current Capabilities
+## Focus Areas
 
-- Central login and JWT-based access
-- Private and group chat with per-device end-to-end encryption support
-- File and folder management through Cloud Page
-- Password-vault functionality in the core application while the standalone service is being designed
-- Runtime integration of external services
-- Habit tracking through Vault Habits
-- VPN-only deployment using Headscale/Tailscale and Split DNS
-- Docker Compose deployment, backup, and operational documentation
+| Area | Direction |
+| --- | --- |
+| Network design | **Least-exposed**, VPN-first access with Headscale/Tailscale and Split DNS |
+| Service boundaries | Independent backends instead of one large application server |
+| Personal cloud | Filesystem-backed storage with **per-user isolation** and Syncthing interoperability |
+| Identity | **Consistent login**, session handling, and authenticated service handoff |
+| Security | Security activity, token hardening, and a private-by-default deployment model |
+| Operations | Docker Compose deployment, **backups**, health checks, and recovery-oriented runbooks |
 
 ## Interface
 
-### Chat
-
-The core application provides the shared navigation and communication interface.
+### Communication
 
 ![Vault Web chat interface](./assets/vault-web-chat.png)
 
-### Cloud Page
-
-Cloud Page is exposed through the central frontend while its file-management backend remains a separate service.
+### Cloud Workspace
 
 ![Vault Web cloud file manager](./assets/vault-web-cloud.png)
 
 ## Deployment Model
 
-The documented deployment keeps Vault Web private by default:
+The documented production setup keeps Vault Web **private by default**. Public DNS is reserved for the **VPN control plane**, while application hostnames resolve only inside the private network through **Split DNS**. Caddy terminates **HTTPS**, Docker Compose runs the services, and operational guidance lives in [`deploy`](https://github.com/Vault-Web/deploy) and [`server-docs`](https://github.com/Vault-Web/server-docs).
 
-1. Application containers communicate on internal Docker networks.
-2. Caddy terminates HTTPS and proxies requests to the frontend.
-3. Headscale manages the private Tailscale-compatible network.
-4. Split DNS resolves the Vault Web hostname only for connected clients.
-5. Cloud Page, backups, and optional Syncthing instances operate as separate stack components.
-
-Start with the [deployment repository](https://github.com/Vault-Web/deploy) for the runnable stack and [Server Docs](https://github.com/Vault-Web/server-docs) for the complete setup and operations guides.
+This model is intentionally conservative: **expose as little as possible**, keep the portal reachable through trusted private access, and treat **backups and monitoring** as part of the product rather than an afterthought.
 
 ## Contributing
 
-Contributions are welcome across application development, service integration, deployment, documentation, and security design. Read the [contribution guidelines](https://github.com/Vault-Web/.github/blob/main/CONTRIBUTING.md) before opening a pull request.
+Contributions are welcome across application development, security design, deployment, documentation, and service integration. Please read the [contribution guidelines](https://github.com/Vault-Web/.github/blob/main/CONTRIBUTING.md) before opening a pull request.
 
-Vault Web is an experimental self-hosting project. Review the configuration and security model carefully before exposing any component beyond a trusted private network.
+Vault Web is an experimental self-hosting project. Review the configuration and security model carefully before exposing any component outside a trusted private network.
